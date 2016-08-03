@@ -1,0 +1,9 @@
+D:\Bizz\Unity\RunnerEnums\bin\Debug\RunnerData.dll
+D:\Bizz\Unity\RunnerEnums\bin\Debug\RunnerData.pdb
+D:\Bizz\Unity\RunnerEnums\obj\Debug\RunnerData.dll
+D:\Bizz\Unity\RunnerEnums\obj\Debug\RunnerData.pdb
+D:\Bizz\Unity\RunnerEnums\obj\Debug\RunnerData.csprojResolveAssemblyReference.cache
+D:\Bizz\Unity\RunnerData\bin\Debug\RunnerData.dll
+D:\Bizz\Unity\RunnerData\bin\Debug\RunnerData.pdb
+D:\Bizz\Unity\RunnerData\obj\Debug\RunnerData.dll
+D:\Bizz\Unity\RunnerData\obj\Debug\RunnerData.pdb
