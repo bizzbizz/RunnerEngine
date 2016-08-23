@@ -7,55 +7,76 @@ public class Block : MonoBehaviour
 {
 	Vector3 center { get { return new Vector3(Width / 2, 4, 0); } }
 	Vector3 size { get { return new Vector3(Width, 8, 0.1f); } }
+	Vector3 playcenter { get { return new Vector3(Width / 2, 4.25f, 0); } }
+	Vector3 playsize { get { return new Vector3(Width, 5.5f, 0.1f); } }
+
+	const float minY = 1.5f;
+	const float maxY = 7;
+
 	public Node[] Nodes
 	{
 		get { return GetComponentsInChildren<Node>(); }
 	}
-	public List<Group> Groups;
 
-	public bool IsSelected = false;
+	public bool IsSelected
+	{
+		get { return gameObject.activeSelf; }
+		set { gameObject.SetActive(value); }
+	}
 	public BlockType Kind;
 	public int Width = 30;
+	public int Number = 0;
+	public bool WrongNumber = false;
 
+	void Update()
+	{
+		if (transform.parent != null) transform.parent = null;
+	}
 	void OnDrawGizmos()
 	{
 		if (!IsSelected) return;
-
-		Gizmos.color = new Color(0, 0, 0, .1f);
-		Gizmos.DrawCube(center, size);
-		Gizmos.color = Color.green;
-		Gizmos.DrawLine(transform.position + new Vector3(0, 0, 0), transform.position + new Vector3(Width, 0, 0));
-		Gizmos.color = Color.black;
-		Gizmos.DrawLine(transform.position + new Vector3(0, 2, 0), transform.position + new Vector3(Width, 2, 0));
-		Gizmos.DrawLine(transform.position + new Vector3(0, 4, 0), transform.position + new Vector3(Width, 4, 0));
-		Gizmos.DrawLine(transform.position + new Vector3(0, 6, 0), transform.position + new Vector3(Width, 6, 0));
+		Draw(Vector3.zero);
 	}
+	public void Draw(Vector3 offset)
+	{
+		Gizmos.color = new Color(0, 0, 0, .2f);
+		Gizmos.DrawCube(offset + center, size);
 
-	public static Block CreateNew(string name, bool addDefaultGroup = true)
+		Gizmos.color = new Color(1, 1, 1, .2f);
+		Gizmos.DrawCube(offset + playcenter, playsize);
+
+		Gizmos.color = Color.green;
+		Gizmos.DrawLine(offset + transform.position + new Vector3(0, 0, 0), offset + transform.position + new Vector3(Width, 0, 0));
+		Gizmos.color = Color.black;
+		Gizmos.DrawLine(offset + transform.position + new Vector3(0, 2.5f, 0), offset + transform.position + new Vector3(Width, 2.5f, 0));
+		Gizmos.DrawLine(offset + transform.position + new Vector3(0, 4.25f, 0), offset + transform.position + new Vector3(Width, 4.25f, 0));
+		Gizmos.DrawLine(offset + transform.position + new Vector3(0, 6, 0), offset + transform.position + new Vector3(Width, 6, 0));
+	}
+	public static Block CreateNew(string name)
 	{
 		var go = new GameObject(name);
 		go.tag = "blk";
 		var blk = go.AddComponent<Block>();
-		blk.Kind = BlockType.normal;
+		blk.Kind = BlockType.free;
 		blk.Width = 30;
 		return blk;
 	}
-	//public void CopyFrom(Block other)
-	//{
-	//	Kind = other.Kind;
-	//	Width = other.Width;
-	//	Value = other.Value;
-	//	Groups = other.Groups.Select(x => new Group(this)).ToList();
-	//	foreach (var item in other.Nodes)
-	//	{
-	//		var node = AddNode((int)item.Kind, item.Variation, item.transform.position, Groups.First(x => x.Id == item.Group.Id));
-	//		node.Probability = item.Probability;
-	//		node.IsMainTarget = item.IsMainTarget;
-	//		node.Quantity = item.Quantity;
-	//		node.Distance = item.Distance;
-	//		node.Arrangement = item.Arrangement;
-	//	}
-	//}
+	public void CopyFrom(Block other)
+	{
+		Kind = other.Kind;
+		Width = other.Width;
+		foreach (var item in other.Nodes)
+		{
+			var node = AddNode((int)item.Kind, item.Variation, item.transform.position, item.Group, item.GroupTag);
+			node.Probability = item.Probability;
+			node.IsMainTarget = item.IsMainTarget;
+			node.Quantity = item.Quantity;
+			node.Distance = item.Distance;
+			node.SS = item.SS;
+			node.SX = item.SX;
+			node.SY = item.SY;
+		}
+	}
 	public Node AddNode(int kind, int variation, Vector3 pos, Group group, GroupTag gtag)
 	{
 		//reset block transform
@@ -77,7 +98,49 @@ public class Block : MonoBehaviour
 
 		return newNode;
 	}
+	public void AutoCorrect()
+	{
+		var children = GetComponentsInChildren<Transform>(true);
+		foreach (var child in children)
+		{
+			var node = child.GetComponent<Node>();
+			if (node == null)
+			{
+				//block should not be in another object
+				if (child.GetComponent<Block>() != null)
+				{
+					child.parent = null;
+				}
+			}
+			else
+			{
+				//flatten inner children
+				var childrenOfNode = node.GetComponentsInChildren<Transform>(true);
+				foreach (var item in childrenOfNode)
+				{
+					item.parent = child;
+				}
+				//reset block reference
+				node.Block = this;
+				//round position
+				if (node.Kind == NodeType.Person)
+				{
+					node.transform.position = new Vector3(
+						Mathf.Max(0, Mathf.Round(4 * node.transform.position.x) / 4),
+						0);
 
+				}
+				else
+				{
+					node.transform.position = new Vector3(
+						Mathf.Max(0, Mathf.Round(4 * node.transform.position.x) / 4),
+						Mathf.Clamp(Mathf.Round(4 * node.transform.position.y) / 4, minY, maxY));
+
+				}
+			}
+		}
+
+	}
 
 	public Node FirstOverlappedNode()
 	{

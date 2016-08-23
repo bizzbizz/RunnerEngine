@@ -11,7 +11,6 @@ public class Node : MonoBehaviour
 
 	//person
 	public bool IsMainTarget { get { return Data.IsMainTarget; } set { Data.IsMainTarget = value; } }
-
 	//coin
 	public int Quantity { get { return Data.Quantity; } set { Data.Quantity = value; } }
 	public float Distance { get { return Data.Distance; } set { Data.Distance = value; } }
@@ -24,7 +23,7 @@ public class Node : MonoBehaviour
 	public GroupTag GroupTag { get { return Data.GroupTag; } set { Data.GroupTag = value; } }
 	public Group Group { get { return Data.Group; } set { Data.Group = value; } }
 	public bool IsFocused = false;
-
+	public bool CanDraw = true;
 
 	public override string ToString()
 	{
@@ -42,6 +41,10 @@ public class Node : MonoBehaviour
 	{
 		return (GroupTag == GroupTag.Fixed ? "" : string.Format("[{0}-{1}]", GroupTag, Group));
 	}
+	public string GroupShortText()
+	{
+		return (GroupTag == GroupTag.Fixed ? "" : string.Format("[{0}-{1}]", GroupTag.ToString()[1], Group.ToString()[1]));
+	}
 	//helper
 	static Color[] groupColors = new[]
 	{
@@ -55,29 +58,41 @@ public class Node : MonoBehaviour
 
 	void OnDrawGizmos()
 	{
-		if (Block == null || !Block.IsSelected) return;
+		if (Block == null || !Block.IsSelected || !CanDraw) return;
+
 		ResetName();
 
-		if (Kind == NodeType.Coin)//coin bundle
-		{
-			for (int i = 0; i < Quantity; i++)
-				drawIcon(transform.position//initial position
-					+ Vector3.right * i * Distance//inner distance
-					+ ((SX == 0 || SY == 0) //check for sinus
-					? Vector3.zero //line
-					: Vector3.up * Mathf.Sin(SS + i * SX) * SY));//sinus
-		}
-		else
-		{
-			drawIcon(transform.position);
-		}
+		Draw(Vector3.zero);
 
 		//write prob
 		Handles.color = Color.red;
 		if (GroupTag == GroupTag.Fixed)
 			Handles.Label(transform.position + Vector3.up, Probability.ToString());
 		else
-			Handles.Label(transform.position + new Vector3(-.25f, 1, 0), Probability.ToString() + GroupText());
+			Handles.Label(transform.position + new Vector3(-.25f, 1, 0), Probability.ToString() + GroupShortText());
+	}
+	public void Draw(Vector3 offset)
+	{
+		if (Kind == NodeType.Coin)//coin bundle
+		{
+			for (int i = 0; i < Quantity; i++)
+				drawIcon(
+					offset +
+					transform.position//initial position
+					+ Vector3.right * i * Distance//inner distance
+					+ ((SX == 0 || SY == 0) //check for sinus
+					? Vector3.zero //line
+					: Vector3.up * Mathf.Sin(SS + i * SX) * SY));//sinus
+		}
+		else if (Kind == NodeType.Eagle && Variation == 2)
+		{
+			Gizmos.DrawWireCube(offset + transform.position, new Vector3(.25f, 2.25f, 0));
+			drawIcon(offset + transform.position);
+		}
+		else
+		{
+			drawIcon(offset + transform.position);
+		}
 	}
 	void drawIcon(Vector3 pos)
 	{
