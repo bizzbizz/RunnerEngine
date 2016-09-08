@@ -18,11 +18,39 @@ public class Block : MonoBehaviour
 		get { return GetComponentsInChildren<Node>(); }
 	}
 
+	//bool _isSelected;
+	//public bool IsSelected
+	//{
+	//	get { return _isSelected; }
+	//	set
+	//	{
+	//		if (_isSelected != value)
+	//		{
+	//			_isSelected = value;
+	//			if (value)
+	//			{
+	//				if(Event.current.type == EventType.ContextClick)
+	//				UnityEditor.Highlighter.Highlight("Hierarchy", name);
+	//			}
+	//		}
+	//	}
+	//}
+	public bool _isSelected;
 	public bool IsSelected
 	{
-		get { return gameObject.activeSelf; }
-		set { gameObject.SetActive(value); }
+		get { return _isSelected; }
+		set
+		{
+			_isSelected = value;
+			var list = GetComponentsInChildren<Node>(true);
+			foreach (var item in list)
+			{
+				item.gameObject.SetActive(value);
+			}
+		}
 	}
+	public int UsedCount;
+
 	public BlockType Kind;
 	public int Width = 30;
 	public int Number = 0;

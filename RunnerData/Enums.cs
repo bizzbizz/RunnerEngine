@@ -29,4 +29,61 @@
 		Parallax = 7,
 		Count = 8,
 	}
+
+	public enum ObjectiveSlot
+	{
+		A = 0,
+		B = 1,
+		C = 2
+	}
+	public enum ObjectiveKind
+	{
+		//A
+		CollectCoin = 1,
+		FlyDistance = 2,
+		FlyDuration = 3,
+
+		//B
+		HitAnyEnemy = 11,
+		HitAnyGroundEnemy = 12,
+		HitSpecificGroundEnemy = 13,
+		HitAnyAirEnemy = 14,
+		HitSpecificAirEnemy = 15,
+
+		//C
+		CollectCollectible = 21,
+		UseConsumable = 22,
+		ActivateSuperpower = 23,
+		SpendCoin = 24,
+		CompleteDailyChallenge = 25,
+		PassBetweenEnemies = 26,
+	}
+	public enum ObjectiveCondition
+	{
+		None = 0,
+		WithCollectible = 1,
+		WithSuperpower = 2,
+		WithoutCoin = 3,
+		WithoutShit = 4,
+	}
+
+	public enum ObjectiveScope
+	{
+		Total = 0,
+		OneRun = 1,
+	}
+	public enum ObjectiveRewardType
+	{
+		Coin = 0,
+		Gem = 1,
+		Heart = 2,
+		Booster = 3,
+	}
+	public enum ObjectiveStatus
+	{
+		NotActive = 0,
+		InProgress = 1,
+		Completed = 2,
+	}
+
 }

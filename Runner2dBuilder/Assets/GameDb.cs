@@ -1,51 +1,81 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using RunnerData;
+
 public class GameDb : MonoBehaviour
 {
 	public Major[] Majors;
-	List<Block> Blocks = new List<Block>();
 	public bool ShowGizmos;
 	public int SelectedIndex;
-
+	public void Init()
+	{
+		Majors = Major.DefaultMajors;
+	}
 	public void DeleteAll()
 	{
-		foreach (var item in Blocks)
-		{
-			if (item != null)
-				DestroyImmediate(item.gameObject);
-		}
-		Blocks.Clear();
 		Majors = null;
 	}
-	public void AddBlock(Block b)
+	public void CountBlockUsage(Block block)
 	{
-		if (!Blocks.Contains(b))
-			Blocks.Add(b);
-	}
-	public void DeleteBlock(Block b)
-	{
-		if (Blocks.Contains(b))
-			Blocks.Remove(b);
-	}
-
-	public void UpdateBlocks(List<Block> _blocks, bool _sortBlocks)
-	{
-		Blocks = Blocks.Where(x => x != null).ToList();
-
-		if (_sortBlocks)
-			Blocks.Sort(new BlockNameComparer());
-
-		if (_blocks.Count != Blocks.Count)
+		block.UsedCount = 0;
+		if (Majors == null) return;
+		for (int i = 0; i < Majors.Length; i++)
 		{
-			_blocks.Clear();
-			foreach (var block in Blocks)
+			for (int j = 0; j < Majors[i].Minors.Length; j++)
 			{
-				_blocks.Add(block);
+				if (Majors[i].Minors[j] == null) continue;
+				if (Majors[i].Minors[j].Block == block) block.UsedCount++;
 			}
 		}
 	}
-
+	public int GetBlockTypeUsageCount(BlockType type)
+	{
+		int count = 0;
+		if (Majors == null) return 0;
+		for (int i = 0; i < Majors.Length; i++)
+		{
+			for (int j = 0; j < Majors[i].Minors.Length; j++)
+			{
+				if (Majors[i].Minors[j] == null) continue;
+				if (Majors[i].Minors[j].Block != null && Majors[i].Minors[j].Kind == type) count++;
+			}
+		}
+		return count;
+	}
+	public int GetBlockTypeUsageCount()
+	{
+		int count = 0;
+		if (Majors == null) return 0;
+		for (int i = 0; i < Majors.Length; i++)
+		{
+			for (int j = 0; j < Majors[i].Minors.Length; j++)
+			{
+				if (Majors[i].Minors[j] == null) continue;
+				if (Majors[i].Minors[j].Block == null) count++;
+			}
+		}
+		return count;
+	}
+	public List<string> GetBlockTypeNumbersWithUsage(RunnerData.BlockType type, int[] numbers)
+	{
+		List<string> list = new List<string>();
+		if (Majors == null) return list;
+		foreach (var num in numbers)
+		{
+		int count = 0;
+			for (int i = 0; i < Majors.Length; i++)
+			{
+				for (int j = 0; j < Majors[i].Minors.Length; j++)
+				{
+					if (Majors[i].Minors[j] == null) continue;
+					if (Majors[i].Minors[j].Kind == type && Majors[i].Minors[j].Number == num) count++;
+				}
+			}
+			list.Add(string.Format("{0}:{1}", num, count));
+		}
+		return list;
+	}
 
 	void OnDrawGizmos()
 	{
@@ -65,7 +95,7 @@ public class GameDb : MonoBehaviour
 			//add space before minor
 			pos += minor.Space * Vector3.right;
 
-			if(minor.Block != null)
+			if (minor.Block != null)
 			{
 				//draw minor block
 				minor.Block.Draw(pos);

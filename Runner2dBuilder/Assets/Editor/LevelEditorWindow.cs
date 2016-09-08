@@ -16,7 +16,7 @@ public class LevelEditorWindow : EditorWindow
 		//var ew = GetWindowWithRect<BlockMakerWindow>(new Rect(0, 0, 200, 600));
 		//if (ew != null)
 		//	ew.Close();
-		var bmw = GetWindow<LevelEditorWindow>();
+		GetWindow<LevelEditorWindow>();
 
 	}
 	#endregion
@@ -82,7 +82,6 @@ public class LevelEditorWindow : EditorWindow
 	{
 		var block = Block.CreateNew(string.Format("block{0:00}", _blocks.Count));
 		_blocks.Add(block);
-		Db.AddBlock(block);
 		activeBlock = block;
 		correctBlockNumber(block);
 		return block;
@@ -93,7 +92,6 @@ public class LevelEditorWindow : EditorWindow
 		if (activeBlock == b)
 			activeBlock = null;
 		_blocks.RemoveAt(idx);
-		Db.DeleteBlock(b);
 		DestroyImmediate(b.gameObject);
 	}
 	Block activeBlock
@@ -132,13 +130,25 @@ public class LevelEditorWindow : EditorWindow
 
 	void refreshBlocks()
 	{
-		Db.UpdateBlocks(_blocks, _sortBlocks);
+		//reload
+		_blocks.Clear();
+		var list = FindObjectsOfType<Block>();
+		foreach (var item in list)
+		{
+			_blocks.Add(item);
+			Db.CountBlockUsage(item);
+		}
 
 		if (!_blocks.Any())
 		{
 			return;
 		}
 
+		//sort
+		if (_sortBlocks)
+			_blocks.Sort(new BlockNameComparer());
+
+		//select one
 		if (_blocks.Count(x => x != null && x.IsSelected) != 1)
 		{
 			foreach (var block in _blocks)
@@ -205,12 +215,84 @@ public class LevelEditorWindow : EditorWindow
 
 
 	//---------------------------------------------------------------------------------------------------------------------
+	bool _showNumbersInfo = false;
 	void onGUILevels()
 	{
+		if (Db.Majors == null)
+		{
+			Db.Init();
+		}
+		float width = 30;
+
+		//usage statistics
+		_showNumbersInfo = EditorGUILayout.BeginToggleGroup("Show Numbers", _showNumbersInfo);
+
+		//numbers
+		if (_showNumbersInfo)
+		{
+			GUILayout.BeginHorizontal();
+
+			//n/a
+			GUILayout.BeginVertical(GUILayout.Width(width));
+			GUILayout.Label("N/A");
+			GUILayout.Label(Db.GetBlockTypeUsageCount().ToString());
+			GUILayout.EndVertical();
+
+			//other types
+			foreach (var type in Enum.GetValues(typeof(BlockType)))
+			{
+				GUILayout.FlexibleSpace();
+				GUILayout.BeginVertical(Helper.evenBkg, GUILayout.Width(width));
+
+				//hdr
+				GUILayout.BeginVertical(Helper.oddBkg);
+				GUILayout.Label(type.ToString());
+				GUILayout.Label(Db.GetBlockTypeUsageCount((BlockType)type).ToString());
+				GUILayout.EndVertical();
+
+				var kind = (BlockType)type;
+				var nums = _blocks.Where(x => x.Kind == kind).GroupBy(x => x.Number).Select(x => x.First().Number).ToArray();
+				var list = Db.GetBlockTypeNumbersWithUsage((BlockType)type, nums);
+				foreach (var item in list)
+				{
+					GUILayout.Label(item);
+				}
+				GUILayout.EndVertical();
+			}
+
+			GUILayout.EndHorizontal();
+		}
+		else
+		{
+			//types
+			GUILayout.BeginHorizontal(Helper.oddBkg);
+			//n/a
+			GUILayout.BeginVertical(GUILayout.Width(width));
+			GUILayout.Label("N/A");
+			GUILayout.Label(Db.GetBlockTypeUsageCount().ToString());
+			GUILayout.EndVertical();
+			//other types
+			foreach (var type in Enum.GetValues(typeof(BlockType)))
+			{
+				GUILayout.FlexibleSpace();
+				GUILayout.BeginVertical(GUILayout.Width(width));
+				GUILayout.Label(type.ToString());
+				GUILayout.Label(Db.GetBlockTypeUsageCount((BlockType)type).ToString());
+				GUILayout.EndVertical();
+			}
+			GUILayout.EndHorizontal();
+		}
+		EditorGUILayout.EndToggleGroup();
+
+
 		//majors
 		var majorNames = Db.Majors.Select(x => x.Speed.ToString("0.#")).ToArray();
 		selectedMajorIndex = GUILayout.SelectionGrid(selectedMajorIndex, majorNames, Db.Majors.Length, GUILayout.Height(40));
 		Db.SelectedIndex = selectedMajorIndex;
+
+		if (selectedMajorIndex >= Db.Majors.Length)
+			return;
+
 		selectedMajor = Db.Majors[selectedMajorIndex];
 		if (selectedMajor == null) return;
 
@@ -251,8 +333,29 @@ public class LevelEditorWindow : EditorWindow
 			{
 				GUILayout.Label("OK.", Helper.okBkg);
 			}
+			if (GUILayout.Button("x", GUILayout.Width(20), GUILayout.MinHeight(16)))
+			{
+				var tmp = selectedMajor.Minors.ToList();
+				tmp.Remove(selectedMajor.Minors[i]);
+				selectedMajor.Minors = tmp.ToArray();
+				tmp.Clear();
+				tmp = null;
+			}
 			GUILayout.EndHorizontal();
 		}
+
+		GUILayout.BeginHorizontal();
+		if (GUILayout.Button("Add"))
+		{
+			var tmp = selectedMajor.Minors.ToList();
+			tmp.Add(new Minor());
+			selectedMajor.Minors = tmp.ToArray();
+			tmp.Clear();
+			tmp = null;
+		}
+		GUILayout.EndHorizontal();
+
+
 		GUILayout.EndScrollView();
 	}
 	//---------------------------------------------------------------------------------------------------------------------
@@ -272,7 +375,8 @@ public class LevelEditorWindow : EditorWindow
 		EditorGUILayout.EndToggleGroup();
 		GUILayout.EndHorizontal();
 
-		GUILayout.BeginHorizontal(GUILayout.Height(110));
+
+		GUILayout.BeginHorizontal(GUILayout.Height(_sortBlocks ? 125 : 140));
 
 		//headers
 		GUILayout.BeginVertical(Helper.evenBkg);
@@ -284,6 +388,7 @@ public class LevelEditorWindow : EditorWindow
 		GUILayout.Label("Number");
 		//GUILayout.Label("table");
 		GUILayout.Label("Dup/Del");
+		GUILayout.Label("Used#");
 		GUILayout.EndVertical();
 
 		//blocks
@@ -292,6 +397,9 @@ public class LevelEditorWindow : EditorWindow
 
 		int removingBlockIndex = -1;
 		Block duplicatingBlock = null;
+
+		float labelwidthbackup = EditorGUIUtility.labelWidth;
+		EditorGUIUtility.labelWidth = 10;
 
 		for (int i = 0; i < _blocks.Count; i++)
 		{
@@ -303,24 +411,33 @@ public class LevelEditorWindow : EditorWindow
 				_blocks[i].gameObject.name = EditorGUILayout.TextField(_blocks[i].gameObject.name);
 			_blocks[i].Kind = (BlockType)EditorGUILayout.EnumPopup(_blocks[i].Kind);
 			_blocks[i].Width = EditorGUILayout.IntField(_blocks[i].Width);
-			if (_blocks[i].WrongNumber)
+
+			//number
+			if (_sortBlocks)
 			{
-				GUILayout.BeginHorizontal();
-				_blocks[i].Number = EditorGUILayout.IntField(_blocks[i].Number, Helper.errBkg);
-				if (GUILayout.Button("Auto"))
-				{
-					correctBlockNumber(_blocks[i]);
-				}
-				GUILayout.EndHorizontal();
+				if (_blocks[i].WrongNumber)
+					EditorGUILayout.LabelField(_blocks[i].Number.ToString(), Helper.errBkg);
+				else
+					EditorGUILayout.LabelField(_blocks[i].Number.ToString());
 			}
 			else
 			{
-				_blocks[i].Number = EditorGUILayout.IntField(_blocks[i].Number);
+				if (_blocks[i].WrongNumber)
+				{
+					GUILayout.BeginHorizontal();
+					_blocks[i].Number = EditorGUILayout.IntField(_blocks[i].Number, Helper.errBkg);
+					if (GUILayout.Button("Auto"))
+					{
+						correctBlockNumber(_blocks[i]);
+					}
+					GUILayout.EndHorizontal();
+				}
+				else
+				{
+					_blocks[i].Number = EditorGUILayout.IntField(_blocks[i].Number);
+				}
 			}
-			//if (GUILayout.Button("..."))
-			//{
-			//	BlockValuesWindow.ShowWindow(_blocks[i]);
-			//}
+
 			GUILayout.BeginHorizontal();
 			if (GUILayout.Button("+"))
 			{
@@ -332,8 +449,13 @@ public class LevelEditorWindow : EditorWindow
 				//mark for delete
 				removingBlockIndex = i;
 			}
-
 			GUILayout.EndHorizontal();
+
+			//used#
+			if (_blocks[i].UsedCount == 0)
+				EditorGUILayout.LabelField(_blocks[i].UsedCount.ToString(), Helper.errBkg);
+			else
+				EditorGUILayout.LabelField(_blocks[i].UsedCount.ToString());
 
 			if (active && !_blocks[i].IsSelected)
 			{
@@ -345,6 +467,8 @@ public class LevelEditorWindow : EditorWindow
 		GUILayout.EndHorizontal();
 		GUILayout.EndScrollView();
 		GUILayout.EndHorizontal();
+
+		EditorGUIUtility.labelWidth = labelwidthbackup;
 
 		//delete block
 		if (removingBlockIndex != -1)
@@ -682,8 +806,25 @@ public class LevelEditorWindow : EditorWindow
 		}
 		EditorGUILayout.EndScrollView();
 
-		//selection buttons
+		//lower part
 		EditorGUILayout.BeginHorizontal();
+
+		//statistics
+		foreach (var group in selectedNodes.GroupBy(x => x.Kind))
+		{
+			string s = "";
+			if (group.Key == NodeType.Coin)
+			{
+				s = string.Format("{1} {0}", group.Key, group.Sum(x => x.Quantity));
+			}
+			else
+			{
+				s = string.Format("{1} {0}", group.Key, group.Count());
+			}
+			GUILayout.Label(s);
+		}
+
+		//selection buttons
 		if (GUILayout.Button("Select All", Helper.h30)) { Selection.instanceIDs = activeBlock.GetComponentsInChildren<Node>().Select(x => x.gameObject.GetInstanceID()).ToArray(); }
 		if (GUILayout.Button("Deselect All", Helper.h30)) { Selection.instanceIDs = new int[] { }; }
 		if (GUILayout.Button("Delete Selected", Helper.h30))
@@ -694,6 +835,7 @@ public class LevelEditorWindow : EditorWindow
 				Selection.instanceIDs = new int[] { };
 			}
 		}
+
 		EditorGUILayout.EndHorizontal();
 
 		GUI.skin.button.padding = backupPadding;
@@ -726,14 +868,26 @@ public class LevelEditorWindow : EditorWindow
 
 		//main tab buttons
 		GUI.backgroundColor = new Color(1f, 1f, 1f);
-		int newShowingMode = GUILayout.SelectionGrid(Helper.CurrentTab, new[] { "Blocks", "Levels" }, 2, GUILayout.Height(40), GUILayout.Width(400));
+		int newShowingMode = GUILayout.SelectionGrid(Helper.CurrentTab, new[] { "Blocks", "Levels" }, 2, GUILayout.Height(40), GUILayout.Width(300));
 
 		//save/load buttons
 		GUI.backgroundColor = new Color(1f, .4f, .4f);
 		if (GUILayout.Button("Delete All", GUILayout.Height(30)))
 		{
 			if (EditorUtility.DisplayDialog("Delete Every fucking thing", "Are you absolutely sure? Delete all Blocks and Levels?", "Abso-fucking-lutely Sure!", "گه خوردم"))
+			{
 				Db.DeleteAll();
+				foreach (var item in _blocks)
+				{
+					DestroyImmediate(item);
+				}
+				_blocks.Clear();
+			}
+		}
+		GUI.backgroundColor = new Color(1f, 1f, .9f);
+		if (GUILayout.Button("refresh blocks", GUILayout.Height(30)))
+		{
+			refreshBlocks();
 		}
 		GUI.backgroundColor = new Color(0f, 1f, .9f);
 		if (GUILayout.Button("Load Blocks", GUILayout.Height(30)))
@@ -748,11 +902,14 @@ public class LevelEditorWindow : EditorWindow
 			else
 			{
 				int result = EditorUtility.DisplayDialogComplex("Overwrite", "Delete Existing Level data?", "بشاش به همه ش", "نرین توش", "گه خوردم");
-				//int result = EditorUtility.DisplayDialogComplex("Overwrite", "Delete Existing Level data?", "(clear) بشاش به همه ش", "(add) نرین توش", "گه خوردم");
+				//clear بشاش به همه ش
+				//(add) نرین توش"
+				//(cancel)گه خوردم
 				switch (result)
 				{
 					//clear
 					case 0:
+						refreshBlocks();
 						selectedNodes.Clear();
 						Selection.instanceIDs = new int[] { };
 						_blocks.ToList().ForEach(x => DestroyImmediate(x.gameObject));
@@ -832,7 +989,7 @@ public class LevelEditorWindow : EditorWindow
 		else
 		{
 			if (Db.Majors == null)
-				Db.Majors = Major.DefaultMajors;
+				Db.Init();
 			onGUILevels();
 		}
 	}
@@ -846,6 +1003,12 @@ public class LevelEditorWindow : EditorWindow
 	//---------------------------------------------------------------------------------------------------------------------
 	private void SaveBlocks()
 	{
+		if (_blocks == null || !_blocks.Any())
+		{
+			EditorUtility.DisplayDialog("Not Saved", "Blocks are not saved in Levels.json", "ریدی");
+			return;
+		}
+
 		foreach (var block in _blocks)
 		{
 			var overlappedNode = block.FirstOverlappedNode();
@@ -919,18 +1082,21 @@ public class LevelEditorWindow : EditorWindow
 	//---------------------------------------------------------------------------------------------------------------------
 	void SaveLevels()
 	{
-		var jo = new JSONObject();
-		var jLevels = new JSONObject();
-
-		if(Db.Majors == null)
+		if (Db.Majors == null)
 		{
-			EditorUtility.DisplayDialog("Not Saved", "Levels are not saved", "ریدی");
+			EditorUtility.DisplayDialog("Not Saved", "Levels are not saved in Game.json", "ریدی");
 			return;
 		}
+
+		//levels
+		var jLevels = new JSONObject();
 		for (int i = 0; i < Db.Majors.Length; i++)
 		{
 			jLevels.Add(Db.Majors[i].ToJson());
 		}
+
+		//root
+		var jo = new JSONObject();
 		jo.AddField("levels", jLevels);
 
 		//save
@@ -996,7 +1162,7 @@ public class LevelEditorWindow : EditorWindow
 		var path = System.IO.Path.Combine(Application.persistentDataPath, "Game.json");
 		if (!System.IO.File.Exists(path))
 		{
-			Db.Majors = Major.DefaultMajors;
+			Db.Init();
 			return;
 		}
 
@@ -1011,7 +1177,7 @@ public class LevelEditorWindow : EditorWindow
 		if (jLevels == null)
 		{
 			EditorUtility.DisplayDialog("Default", "Levels not found. using default values", "اوکی 2کی");
-			Db.Majors = Major.DefaultMajors;
+			Db.Init();
 		}
 		else
 		{

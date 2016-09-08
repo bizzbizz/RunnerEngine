@@ -1,4 +1,6 @@
-﻿[System.Serializable]
+﻿using RunnerData;
+
+[System.Serializable]
 public class Objective
 {
 	public delegate void ObjectiveUpdatedDelegate(int val);
@@ -7,15 +9,23 @@ public class Objective
 	public event ObjectiveUpdatedDelegate ObjectiveUpdated;
 	public event ObjectiveCompletedDelegate ObjectiveCompleted;
 
-	public int Order;
+	public ObjectiveSlot Slot;
 	public string Name;
 	public string Description;
+	public int Index;
 
-	public int TargetValue;
-	public ObjectiveType Kind;
-	public ObjectiveScope Scope;
-
+	public ObjectiveTarget Target;
 	public ObjectiveReward Reward;
+
+	public ObjectiveStatus Status
+	{
+		get; set;
+	}
+
+	public int GetUniqueCode()
+	{
+		return Index + (int)Slot * 10000;
+	}
 
 	[System.NonSerialized]
 	private int _value;
@@ -25,12 +35,12 @@ public class Objective
 		set
 		{
 			_value = value;
-			if(Status == ObjectiveStatus.InProgress)
+			if (Status == ObjectiveStatus.InProgress)
 			{
 				if (ObjectiveUpdated != null)
 					ObjectiveUpdated(value);
 
-				if (value >= TargetValue)
+				if (value >= Target.Value)
 				{
 					if (ObjectiveCompleted != null)
 						ObjectiveCompleted();
@@ -40,39 +50,67 @@ public class Objective
 		}
 	}
 
-	public ObjectiveStatus Status
+
+	public Objective()
 	{
-		get; set;
+
 	}
-
-	public int[] RequirementCodes
+	public Objective Clone()
 	{
-		get; set;
-	}
-
-	[System.NonSerialized]
-	private Objective[] Requirements;
-
-	public int GetUniqueCode()
-	{
-		return Order * 20 + (int)Scope * 10 + (int)Kind;
-	}
-
-	public bool RequirementsMet()
-	{
-		//pass if no requirements
-		if (Requirements == null) return true;
-
-		//else check all requirements
-		foreach (var req in Requirements)
+		return new Objective
 		{
-			if (req.Status != ObjectiveStatus.Completed)
-			{
-				//not met
-				return false;
-			}
-		}
-		//all met
-		return true;
+			Slot = Slot,
+			Name = Name,
+			Description = Description,
+			Index = Index + 1,
+
+			Target = Target,
+
+			Reward = Reward,
+		};
+	}
+
+
+	public Objective(JSONObject jo)
+	{
+		Slot = (ObjectiveSlot)(int)jo.GetField("slot").f;
+		Name = jo.GetField("name").str;
+		Description = jo.GetField("desc").str;
+		Index = (int)jo.GetField("index").f;
+
+		Target = new ObjectiveTarget();
+		Target.Kind = (ObjectiveKind)(int)jo.GetField("tkind").f;
+		Target.Value = (int)jo.GetField("tval").f;
+		Target.Scope = (ObjectiveScope)(int)jo.GetField("tscope").f;
+		Target.Condition = (ObjectiveCondition)(int)jo.GetField("tcond").f;
+		Target.DetailGround = (PersonVariation)(int)jo.GetField("tdg").f;
+		Target.DetailAir = (EagleVariation)(int)jo.GetField("tda").f;
+		Target.DetailCollectible = (CollectibleVariation)(int)jo.GetField("tdc").f;
+
+		Reward = new ObjectiveReward();
+		Reward.Kind = (ObjectiveRewardType)(int)jo.GetField("rkind").f;
+		Reward.Value = (int)jo.GetField("rval").f;
+	}
+
+	public JSONObject ToJSONObject()
+	{
+		JSONObject jo = new JSONObject();
+
+		jo.AddField("slot", (int)Slot);
+		jo.AddField("name", Name);
+		jo.AddField("desc", Description);
+		jo.AddField("index", Index);
+
+		jo.AddField("tkind", (int)Target.Kind);
+		jo.AddField("tval", Target.Value);
+		jo.AddField("tscope", (int)Target.Scope);
+		jo.AddField("tcond", (int)Target.Condition);
+		jo.AddField("tdg", (int)Target.DetailGround);
+		jo.AddField("tda", (int)Target.DetailAir);
+		jo.AddField("tdc", (int)Target.DetailCollectible);
+
+		jo.AddField("rkind", (int)Reward.Kind);
+		jo.AddField("rval", Reward.Value);
+		return jo;
 	}
 }
