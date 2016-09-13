@@ -7,6 +7,7 @@
 		public NodeType Kind = NodeType.Coin;
 		public int Variation = 0;
 		public float Probability = 1;
+		public float[] Probabilities = null;
 		public float X;
 		public float Y;
 

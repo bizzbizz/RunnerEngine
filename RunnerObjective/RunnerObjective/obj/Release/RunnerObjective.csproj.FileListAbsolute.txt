@@ -8,3 +8,4 @@ D:\Bizz\Unity\RunnerEngine\RunnerObjective\RunnerObjective\obj\Release\RunnerObj
 D:\Bizz\Unity\RunnerEngine\RunnerObjective\RunnerObjective\obj\Release\RunnerObjective.pdb
 D:\Bizz\Unity\RunnerEngine\RunnerObjective\RunnerObjective\bin\Release\RunnerData.dll
 D:\Bizz\Unity\RunnerEngine\RunnerObjective\RunnerObjective\bin\Release\RunnerData.pdb
+D:\Bizz\Unity\RunnerEngine\RunnerObjective\RunnerObjective\obj\Release\RunnerObjective.csprojResolveAssemblyReference.cache

@@ -11,4 +11,5 @@ public struct ObjectiveTarget
 	public PersonVariation DetailGround;
 	public EagleVariation DetailAir;
 	public CollectibleVariation DetailCollectible;
+	public ObjectiveRewardType DetailConsumable;
 }

@@ -1,4 +1,6 @@
-﻿[System.Serializable]
+﻿using RunnerData;
+
+[System.Serializable]
 public class Major
 {
 	public string Name;

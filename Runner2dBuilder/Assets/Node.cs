@@ -8,6 +8,10 @@ public class Node : MonoBehaviour
 	public NodeType Kind { get { return Data.Kind; } set { Data.Kind = value; } }
 	public int Variation { get { return Data.Variation; } set { Data.Variation = value; } }
 	public float Probability { get { return Data.Probability; } set { Data.Probability = value; } }
+	/// <summary>
+	/// probabilities array is only meant for collectibles (upgrade levels)
+	/// </summary>
+	public float[] Probabilities { get { return Data.Probabilities; } set { Data.Probabilities = value; } }
 
 	//person
 	public bool IsMainTarget { get { return Data.IsMainTarget; } set { Data.IsMainTarget = value; } }
@@ -24,6 +28,8 @@ public class Node : MonoBehaviour
 	public Group Group { get { return Data.Group; } set { Data.Group = value; } }
 	public bool IsFocused = false;
 	public bool CanDraw = true;
+
+
 
 	public override string ToString()
 	{

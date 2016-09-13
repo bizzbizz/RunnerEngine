@@ -15,7 +15,7 @@ public class Block : MonoBehaviour
 
 	public Node[] Nodes
 	{
-		get { return GetComponentsInChildren<Node>(); }
+		get { return GetComponentsInChildren<Node>(true); }
 	}
 
 	//bool _isSelected;

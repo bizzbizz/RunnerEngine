@@ -743,15 +743,31 @@ public class LevelEditorWindow : EditorWindow
 					node.SS = EditorGUILayout.FloatField(node.SS / 1.57f, GUILayout.Width(30)) * 1.57f;
 					node.SX = EditorGUILayout.FloatField(node.SX * 10, GUILayout.Width(30)) / 10;
 					node.SY = EditorGUILayout.FloatField(node.SY, GUILayout.Width(30));
+					node.Probability = Mathf.Round(EditorGUILayout.Slider(node.Probability, 0f, 1f) * 10) / 10f;
 				}
 				else if (node.Kind == NodeType.Person)
 				{
 					//main person
 					node.IsMainTarget = GUILayout.Toggle(node.IsMainTarget, "Main", GUILayout.Width(166));
+					node.Probability = Mathf.Round(EditorGUILayout.Slider(node.Probability, 0f, 1f) * 10) / 10f;
+				}
+				else if (node.Kind == NodeType.Collectible)
+				{
+					GUILayout.Space(170);
+					GUILayout.FlexibleSpace();
+
+					if (node.Probabilities == null)
+						node.Probabilities = new float[5];
+					for (int i = 0; i < 5; i++)
+					{
+						node.Probabilities[i] = EditorGUILayout.FloatField(node.Probabilities[i], GUILayout.Width(30));
+					}
 				}
 				else
+				{
 					GUILayout.Space(170);
-				node.Probability = Mathf.Round(EditorGUILayout.Slider(node.Probability, 0f, 1f) * 10) / 10f;
+					node.Probability = Mathf.Round(EditorGUILayout.Slider(node.Probability, 0f, 1f) * 10) / 10f;
+				}
 
 				//u,d,l,r
 				if (node.Kind == NodeType.Person)
@@ -1045,6 +1061,11 @@ public class LevelEditorWindow : EditorWindow
 				nbjo.AddField("tag", (int)node.GroupTag);
 
 				nbjo.AddField("prob", node.Probability);
+				if (node.Probabilities == null) node.Probabilities = new float[5];
+				for (int i = 0; i < 5; i++)
+				{
+					nbjo.AddField("p" + i, node.Probabilities[i]);
+				}
 				//person
 				nbjo.AddField("main", node.IsMainTarget);
 				//coin
@@ -1144,6 +1165,12 @@ public class LevelEditorWindow : EditorWindow
 				var node = block.AddNode(kind, variation, pos, group, tag);
 
 				node.Probability = item.GetField("prob").f;
+				node.Probabilities = new float[5];
+				for (int i = 0; i < 5; i++)
+				{
+					if (item.HasField("p" + i))
+						node.Probabilities[i] = item.GetField("p" + i).f;
+				}
 				//person
 				node.IsMainTarget = item.GetField("main").b;
 				//coin

@@ -107,6 +107,8 @@ public class ObjectiveMakerWindow : EditorWindow
 				o.Target.DetailGround = (PersonVariation)EditorGUILayout.EnumPopup("Ground", o.Target.DetailGround);
 			if (o.Target.Kind == ObjectiveKind.CollectCollectible)
 				o.Target.DetailCollectible = (CollectibleVariation)EditorGUILayout.EnumPopup("Collectible", o.Target.DetailCollectible);
+			if (o.Target.Kind == ObjectiveKind.UseConsumable)
+				o.Target.DetailConsumable = (ObjectiveRewardType)EditorGUILayout.EnumPopup("Consumable", o.Target.DetailConsumable);
 
 			GUILayout.Space(30);
 

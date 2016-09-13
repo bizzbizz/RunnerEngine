@@ -3,11 +3,11 @@
 [System.Serializable]
 public class Objective
 {
-	public delegate void ObjectiveUpdatedDelegate(int val);
-	public delegate void ObjectiveCompletedDelegate();
+	//public delegate void ObjectiveUpdatedDelegate(int val);
+	//public delegate void ObjectiveCompletedDelegate();
 
-	public event ObjectiveUpdatedDelegate ObjectiveUpdated;
-	public event ObjectiveCompletedDelegate ObjectiveCompleted;
+	//public event ObjectiveUpdatedDelegate ObjectiveUpdated;
+	//public event ObjectiveCompletedDelegate ObjectiveCompleted;
 
 	public ObjectiveSlot Slot;
 	public string Name;
@@ -27,28 +27,28 @@ public class Objective
 		return Index + (int)Slot * 10000;
 	}
 
-	[System.NonSerialized]
-	private int _value;
-	public int CurrentValue
-	{
-		get { return _value; }
-		set
-		{
-			_value = value;
-			if (Status == ObjectiveStatus.InProgress)
-			{
-				if (ObjectiveUpdated != null)
-					ObjectiveUpdated(value);
+	//[System.NonSerialized]
+	//private int _value;
+	//public int CurrentValue
+	//{
+	//	get { return _value; }
+	//	set
+	//	{
+	//		_value = value;
+	//		if (Status == ObjectiveStatus.InProgress)
+	//		{
+	//			if (ObjectiveUpdated != null)
+	//				ObjectiveUpdated(value);
 
-				if (value >= Target.Value)
-				{
-					if (ObjectiveCompleted != null)
-						ObjectiveCompleted();
-					Status = ObjectiveStatus.Completed;
-				}
-			}
-		}
-	}
+	//			if (value >= Target.Value)
+	//			{
+	//				if (ObjectiveCompleted != null)
+	//					ObjectiveCompleted();
+	//				Status = ObjectiveStatus.Completed;
+	//			}
+	//		}
+	//	}
+	//}
 
 
 	public Objective()
@@ -86,6 +86,8 @@ public class Objective
 		Target.DetailGround = (PersonVariation)(int)jo.GetField("tdg").f;
 		Target.DetailAir = (EagleVariation)(int)jo.GetField("tda").f;
 		Target.DetailCollectible = (CollectibleVariation)(int)jo.GetField("tdc").f;
+		if (jo.HasField("tdo"))//newly added
+			Target.DetailConsumable = (ObjectiveRewardType)(int)jo.GetField("tdo").f;
 
 		Reward = new ObjectiveReward();
 		Reward.Kind = (ObjectiveRewardType)(int)jo.GetField("rkind").f;
@@ -108,6 +110,7 @@ public class Objective
 		jo.AddField("tdg", (int)Target.DetailGround);
 		jo.AddField("tda", (int)Target.DetailAir);
 		jo.AddField("tdc", (int)Target.DetailCollectible);
+		jo.AddField("tdo", (int)Target.DetailConsumable);
 
 		jo.AddField("rkind", (int)Reward.Kind);
 		jo.AddField("rval", Reward.Value);
