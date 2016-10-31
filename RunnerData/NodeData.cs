@@ -32,10 +32,10 @@
 					return ((CollectibleVariation)Variation).ToString();
 				case NodeType.Food:
 					return ((FoodVariation)Variation).ToString();
-				case NodeType.Person:
-					return ((PersonVariation)Variation).ToString();
-				case NodeType.Eagle:
-					return ((EagleVariation)Variation).ToString();
+				case NodeType.GroundEnemy:
+					return ((GroundVariation)Variation).ToString();
+				case NodeType.AirEnemy:
+					return ((AirVariation)Variation).ToString();
 				case NodeType.Coin:
 				default:
 					return "";

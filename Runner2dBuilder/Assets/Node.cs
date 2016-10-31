@@ -39,7 +39,7 @@ public class Node : MonoBehaviour
 	{
 		if (Data != null)
 		{
-			if (Kind != NodeType.Person) IsMainTarget = false;
+			if (Kind != NodeType.GroundEnemy) IsMainTarget = false;
 			gameObject.name = Data.ToString() + " " + Probability + GroupText();
 		}
 	}
@@ -90,7 +90,7 @@ public class Node : MonoBehaviour
 					? Vector3.zero //line
 					: Vector3.up * Mathf.Sin(SS + i * SX) * SY));//sinus
 		}
-		else if (Kind == NodeType.Eagle && Variation == 2)
+		else if (Kind == NodeType.AirEnemy && Variation == 2)
 		{
 			Gizmos.DrawWireCube(offset + transform.position, new Vector3(.25f, 2.25f, 0));
 			drawIcon(offset + transform.position);

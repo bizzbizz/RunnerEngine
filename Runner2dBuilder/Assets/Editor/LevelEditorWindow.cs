@@ -703,7 +703,7 @@ public class LevelEditorWindow : EditorWindow
 				//x,y
 				var pos = node.transform.position;
 				pos.x = EditorGUILayout.FloatField(node.transform.position.x, Helper.w40h16);
-				if (node.Kind == NodeType.Person)
+				if (node.Kind == NodeType.GroundEnemy)
 				{
 					GUILayout.Space(44);
 				}
@@ -723,11 +723,11 @@ public class LevelEditorWindow : EditorWindow
 					case NodeType.Food:
 						node.Variation = (int)(FoodVariation)EditorGUILayout.EnumPopup((FoodVariation)node.Variation, GUILayout.Width(60));
 						break;
-					case NodeType.Person:
-						node.Variation = (int)(PersonVariation)EditorGUILayout.EnumPopup((PersonVariation)node.Variation, GUILayout.Width(60));
+					case NodeType.GroundEnemy:
+						node.Variation = (int)(GroundVariation)EditorGUILayout.EnumPopup((GroundVariation)node.Variation, GUILayout.Width(60));
 						break;
-					case NodeType.Eagle:
-						node.Variation = (int)(EagleVariation)EditorGUILayout.EnumPopup((EagleVariation)node.Variation, GUILayout.Width(60));
+					case NodeType.AirEnemy:
+						node.Variation = (int)(AirGroupVariation)EditorGUILayout.EnumPopup((AirGroupVariation)node.Variation, GUILayout.Width(60));
 						break;
 					case NodeType.Coin:
 					default:
@@ -745,7 +745,7 @@ public class LevelEditorWindow : EditorWindow
 					node.SY = EditorGUILayout.FloatField(node.SY, GUILayout.Width(30));
 					node.Probability = Mathf.Round(EditorGUILayout.Slider(node.Probability, 0f, 1f) * 10) / 10f;
 				}
-				else if (node.Kind == NodeType.Person)
+				else if (node.Kind == NodeType.GroundEnemy)
 				{
 					//main person
 					node.IsMainTarget = GUILayout.Toggle(node.IsMainTarget, "Main", GUILayout.Width(166));
@@ -770,7 +770,7 @@ public class LevelEditorWindow : EditorWindow
 				}
 
 				//u,d,l,r
-				if (node.Kind == NodeType.Person)
+				if (node.Kind == NodeType.GroundEnemy)
 				{
 					GUILayout.Space(50);
 				}

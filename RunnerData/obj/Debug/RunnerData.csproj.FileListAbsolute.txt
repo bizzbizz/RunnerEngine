@@ -12,3 +12,8 @@ D:\Bizz\Unity\RunnerEngine\RunnerData\bin\Debug\RunnerData.pdb
 D:\Bizz\Unity\RunnerEngine\RunnerData\obj\Debug\RunnerData.dll
 D:\Bizz\Unity\RunnerEngine\RunnerData\obj\Debug\RunnerData.pdb
 D:\Bizz\Unity\RunnerEngine\RunnerData\obj\Debug\RunnerData.csprojResolveAssemblyReference.cache
+D:\Bizhan\Unity\RunnerEngine\RunnerData\bin\Debug\RunnerData.dll
+D:\Bizhan\Unity\RunnerEngine\RunnerData\bin\Debug\RunnerData.pdb
+D:\Bizhan\Unity\RunnerEngine\RunnerData\obj\Debug\RunnerData.dll
+D:\Bizhan\Unity\RunnerEngine\RunnerData\obj\Debug\RunnerData.pdb
+D:\Bizhan\Unity\RunnerEngine\RunnerData\obj\Debug\RunnerData.csprojResolveAssemblyReference.cache

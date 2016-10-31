@@ -92,9 +92,10 @@ public class ObjectiveMakerWindow : EditorWindow
 
 			GUILayout.Label("Info", EditorStyles.boldLabel);
 			o.Name = EditorGUILayout.TextField("Name", o.Name);
-			o.Description = EditorGUILayout.TextField("Description", o.Description);
 			o.Slot = (ObjectiveSlot)GUILayout.SelectionGrid((int)o.Slot, System.Enum.GetNames(typeof(ObjectiveSlot)), System.Enum.GetValues(typeof(ObjectiveSlot)).Length);
 			o.Index = EditorGUILayout.IntField("Index", o.Index);
+			o.Value = EditorGUILayout.FloatField("Value", o.Value);
+			o.Reward = EditorGUILayout.IntField("XP", o.Reward);
 
 			GUILayout.Space(30);
 
@@ -102,9 +103,9 @@ public class ObjectiveMakerWindow : EditorWindow
 			o.Target.Value = EditorGUILayout.IntField("Value", o.Target.Value);
 			o.Target.Kind = (ObjectiveKind)EditorGUILayout.EnumPopup("Kind", o.Target.Kind);
 			if (o.Target.Kind == ObjectiveKind.HitSpecificAirEnemy)
-				o.Target.DetailAir = (EagleVariation)EditorGUILayout.EnumPopup("Air", o.Target.DetailAir);
+				o.Target.DetailAir = (AirVariation)EditorGUILayout.EnumPopup("Air", o.Target.DetailAir);
 			if (o.Target.Kind == ObjectiveKind.HitSpecificGroundEnemy)
-				o.Target.DetailGround = (PersonVariation)EditorGUILayout.EnumPopup("Ground", o.Target.DetailGround);
+				o.Target.DetailGround = (GroundVariation)EditorGUILayout.EnumPopup("Ground", o.Target.DetailGround);
 			if (o.Target.Kind == ObjectiveKind.CollectCollectible)
 				o.Target.DetailCollectible = (CollectibleVariation)EditorGUILayout.EnumPopup("Collectible", o.Target.DetailCollectible);
 			if (o.Target.Kind == ObjectiveKind.UseConsumable)
@@ -118,11 +119,6 @@ public class ObjectiveMakerWindow : EditorWindow
 			if (o.Target.Condition == ObjectiveCondition.WithCollectible)
 				o.Target.DetailCollectible = (CollectibleVariation)EditorGUILayout.EnumPopup("Collectible", o.Target.DetailCollectible);
 
-			GUILayout.Space(30);
-
-			GUILayout.Label("Reward", EditorStyles.boldLabel);
-			o.Reward.Value = EditorGUILayout.IntField("Value", o.Reward.Value);
-			o.Reward.Kind = (ObjectiveRewardType)GUILayout.SelectionGrid((int)o.Reward.Kind, System.Enum.GetNames(typeof(ObjectiveRewardType)), System.Enum.GetValues(typeof(ObjectiveRewardType)).Length);
 
 			GUILayout.Space(30);
 

@@ -5,14 +5,52 @@
 		Collectible = 0,
 		Coin = 1,
 		Food = 2,
-		Person = 3,
-		Eagle = 4,
+		GroundEnemy = 3,
+		AirEnemy = 4,
 	}
 	public enum BlockType { free, person1, person2, person3, funCoin, funShit, funDrive, challange, tutorial, other }
 	public enum GroupTag { Fixed, T1, T2, T3, T4, T5, T6, T7, T8, T9 }
 	public enum Group { G1, G2, G3, G4, G5, G6 }
-	public enum PersonVariation { Normal, Fat, Girl, Driver, Bride }
-	public enum EagleVariation { Normal, Fast, Sinus }
+	public enum GroundVariation { Normal = 0, Fat = 1, Girl = 2, Kid = 3, Ghelyuni = 4, Elderly = 5}
+	public enum AirVariation
+	{
+		Tuka = 0, Vulture = 1, Pelican = 2,
+		Owl = 3, Bat = 4,
+	}
+	public enum AirGroupVariation { Normal = 0, Fast = 1, Sinus = 2}
+	public static class AirVariationConverter
+	{
+		public static AirVariation Convert(AirGroupVariation agv, bool isNight)
+		{
+			if (isNight)
+			{
+				switch (agv)
+				{
+					default:
+					case AirGroupVariation.Normal:
+						return AirVariation.Tuka;
+					case AirGroupVariation.Fast:
+						return AirVariation.Owl;
+					case AirGroupVariation.Sinus:
+						return AirVariation.Bat;
+				}
+			}
+			else
+			{
+				switch (agv)
+				{
+					default:
+					case AirGroupVariation.Normal:
+						return AirVariation.Tuka;
+					case AirGroupVariation.Fast:
+						return AirVariation.Vulture;
+					case AirGroupVariation.Sinus:
+						return AirVariation.Pelican;
+				}
+			}
+		}
+	}
+
 	public enum CollectibleVariation { Magnet = 0, Oil = 1, Rocket = 2, Plane = 3, Gem = 4, Heart = 5, }
 	public enum FoodVariation { Small, Medium, Large, Drink }
 	public enum CoinArrangement { Line, SmallSinus, BigSinus }

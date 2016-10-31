@@ -151,7 +151,7 @@ public class Block : MonoBehaviour
 				//reset block reference
 				node.Block = this;
 				//round position
-				if (node.Kind == NodeType.Person)
+				if (node.Kind == NodeType.GroundEnemy)
 				{
 					node.transform.position = new Vector3(
 						Mathf.Max(0, Mathf.Round(4 * node.transform.position.x) / 4),
@@ -183,10 +183,10 @@ public class Block : MonoBehaviour
 	public Node FirstOverlappedNode(Node other)
 	{
 		//check for incorrect positioning
-		if (other.Kind == NodeType.Person)
+		if (other.Kind == NodeType.GroundEnemy)
 		{
 			//check other people
-			return Nodes.FirstOrDefault(n => n != other && n.Kind == NodeType.Person &&
+			return Nodes.FirstOrDefault(n => n != other && n.Kind == NodeType.GroundEnemy &&
 				Mathf.Abs(other.transform.position.x - n.transform.position.x) < .1f);
 		}
 		else

@@ -9,3 +9,10 @@ D:\Bizz\Unity\RunnerEngine\RunnerObjective\RunnerObjective\obj\Release\RunnerObj
 D:\Bizz\Unity\RunnerEngine\RunnerObjective\RunnerObjective\bin\Release\RunnerData.dll
 D:\Bizz\Unity\RunnerEngine\RunnerObjective\RunnerObjective\bin\Release\RunnerData.pdb
 D:\Bizz\Unity\RunnerEngine\RunnerObjective\RunnerObjective\obj\Release\RunnerObjective.csprojResolveAssemblyReference.cache
+D:\Bizhan\Unity\RunnerEngine\RunnerObjective\RunnerObjective\bin\Release\RunnerObjective.dll
+D:\Bizhan\Unity\RunnerEngine\RunnerObjective\RunnerObjective\bin\Release\RunnerObjective.pdb
+D:\Bizhan\Unity\RunnerEngine\RunnerObjective\RunnerObjective\bin\Release\RunnerData.dll
+D:\Bizhan\Unity\RunnerEngine\RunnerObjective\RunnerObjective\bin\Release\RunnerData.pdb
+D:\Bizhan\Unity\RunnerEngine\RunnerObjective\RunnerObjective\obj\Release\RunnerObjective.csprojResolveAssemblyReference.cache
+D:\Bizhan\Unity\RunnerEngine\RunnerObjective\RunnerObjective\obj\Release\RunnerObjective.dll
+D:\Bizhan\Unity\RunnerEngine\RunnerObjective\RunnerObjective\obj\Release\RunnerObjective.pdb

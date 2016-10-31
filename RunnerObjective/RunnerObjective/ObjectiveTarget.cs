@@ -8,8 +8,8 @@ public struct ObjectiveTarget
 	public ObjectiveCondition Condition;
 	public ObjectiveScope Scope;
 
-	public PersonVariation DetailGround;
-	public EagleVariation DetailAir;
+	public GroundVariation DetailGround;
+	public AirVariation DetailAir;
 	public CollectibleVariation DetailCollectible;
 	public ObjectiveRewardType DetailConsumable;
 }

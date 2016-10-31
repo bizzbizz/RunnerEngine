@@ -15,7 +15,8 @@ public class Objective
 	public int Index;
 
 	public ObjectiveTarget Target;
-	public ObjectiveReward Reward;
+	public int Reward;
+	public float Value;
 
 	public ObjectiveStatus Status
 	{
@@ -83,15 +84,16 @@ public class Objective
 		Target.Value = (int)jo.GetField("tval").f;
 		Target.Scope = (ObjectiveScope)(int)jo.GetField("tscope").f;
 		Target.Condition = (ObjectiveCondition)(int)jo.GetField("tcond").f;
-		Target.DetailGround = (PersonVariation)(int)jo.GetField("tdg").f;
-		Target.DetailAir = (EagleVariation)(int)jo.GetField("tda").f;
+		Target.DetailGround = (GroundVariation)(int)jo.GetField("tdg").f;
+		Target.DetailAir = (AirVariation)(int)jo.GetField("tda").f;
 		Target.DetailCollectible = (CollectibleVariation)(int)jo.GetField("tdc").f;
 		if (jo.HasField("tdo"))//newly added
 			Target.DetailConsumable = (ObjectiveRewardType)(int)jo.GetField("tdo").f;
 
-		Reward = new ObjectiveReward();
-		Reward.Kind = (ObjectiveRewardType)(int)jo.GetField("rkind").f;
-		Reward.Value = (int)jo.GetField("rval").f;
+		if (jo.HasField("reward"))
+			Reward = (int)jo.GetField("reward").f;
+		if (jo.HasField("value"))
+			Value = jo.GetField("value").f;
 	}
 
 	public JSONObject ToJSONObject()
@@ -112,8 +114,8 @@ public class Objective
 		jo.AddField("tdc", (int)Target.DetailCollectible);
 		jo.AddField("tdo", (int)Target.DetailConsumable);
 
-		jo.AddField("rkind", (int)Reward.Kind);
-		jo.AddField("rval", Reward.Value);
+		jo.AddField("reward", Reward);
+		jo.AddField("value", Value);
 		return jo;
 	}
 }
